@@ -1,0 +1,124 @@
+-- Trigger MHBLACK por confirmacion - MHBLACK-CNF v1.0 - Eduars - para Johnny :)  
+
+instrument { name = "MHBLACK-CNF", overlay = true, icon = "indicators:BB" }
+
+-- input de colores de Triangulos COMPRA VENTA
+input_group { "ENTRADA - COMPRA COLOR", call_color = input { default="#17f702", type = input.color } }
+input_group { "ENTRADA - VENTA COLOR", put_color = input { default="#fc0303", type = input.color } }
+
+-- Define variables de color de velas
+
+VEL1 = "DOJ"
+VEL3 = "DOJ"
+VEL4 = "DOJ"
+VEL5 = "DOJ"
+VEL6 = "DOJ"
+VEL7 = "DOJ"
+VEL9 = "DOJ"
+VEL10 = "DOJ"
+VEL11 = "DOJ"
+
+-- ifs para averiguar y almacenar color de velas para analisis
+
+if ((close[1] - open[1]) > 0) then VEL1 = "VER"
+end    
+if ((close[1] - open[1]) < 0) then VEL1 = "ROJ"
+end    
+
+if ((close[3] - open[3]) > 0) then VEL3 = "VER"
+end    
+if ((close[3] - open[3]) < 0) then VEL3 = "ROJ"
+end    
+
+if ((close[4] - open[4]) > 0) then VEL4 = "VER"
+end    
+if ((close[4] - open[4]) < 0) then VEL4 = "ROJ"
+end
+
+if ((close[5] - open[5]) > 0) then VEL5 = "VER"
+end    
+if ((close[5] - open[5]) < 0) then VEL5 = "ROJ"
+end
+
+if ((close[6] - open[6]) > 0) then VEL6 = "VER"
+end    
+if ((close[6] - open[6]) < 0) then VEL6 = "ROJ"
+end
+
+if ((close[7] - open[7]) > 0) then VEL7 = "VER"
+end    
+if ((close[7] - open[7]) < 0) then VEL7 = "ROJ"
+end
+
+if ((close[9] - open[9]) > 0) then VEL9 = "VER"
+end    
+if ((close[9] - open[9]) < 0) then VEL9 = "ROJ"
+end
+
+if ((close[10] - open[10]) > 0) then VEL10 = "VER"
+end    
+if ((close[10] - open[10]) < 0) then VEL10 = "ROJ"
+end
+
+if ((close[11] - open[11]) > 0) then VEL11 = "VER"
+end    
+if ((close[11] - open[11]) < 0) then VEL11 = "ROJ"
+end
+
+-- TRIGGERS:
+
+ENTCNF = nil
+TR1 = nil
+TR2 = nil
+TR3 = nil
+TR4 = nil
+
+-- if de MHBLACK para entrar por venta
+if ((VEL9 == "VER" and VEL10 == "VER" and VEL11 == "VER") or (VEL9 == "VER" and VEL10 == "VER" and VEL11 == "ROJ") or (VEL9 == "VER" and VEL10 == "ROJ" and VEL11 == "VER") or (VEL9 == "ROJ" and VEL10 == "VER" and VEL11 == "VER")) then TR1 = "M ROJO"
+end
+if (VEL5 == "VER" and VEL6 == "VER" and VEL7 == "VER") then TR2 = "VERDE"
+end
+if ((VEL3 == "VER" and VEL4 == "VER" and VEL5 == "VER") or (VEL3 == "VER" and VEL4 == "VER" and VEL5 == "ROJ") or (VEL3 == "VER" and VEL4 == "ROJ" and VEL5 == "VER") or (VEL3 == "ROJ" and VEL4 == "VER" and VEL5 == "VER")) then TR3 = "M ROJO"
+end
+if (TR1 == "M ROJO" and TR2 == "VERDE" and TR3 == "M ROJO" and VEL1 == "VER") then ENTCNF = "ROJO"
+end    
+
+-- if de MHBLACK para entrar por compra
+if ((VEL9 == "ROJ" and VEL10 == "ROJ" and VEL11 == "ROJ") or (VEL9 == "ROJ" and VEL10 == "ROJ" and VEL11 == "VER") or (VEL9 == "ROJ" and VEL10 == "VER" and VEL11 == "ROJ") or (VEL9 == "VER" and VEL10 == "ROJ" and VEL11 == "ROJ")) then TR1 = "M VERDE"
+end
+if (VEL5 == "ROJ" and VEL6 == "ROJ" and VEL7 == "ROJ") then TR2 = "ROJO"
+end
+if ((VEL3 == "ROJ" and VEL4 == "ROJ" and VEL5 == "ROJ") or (VEL3 == "ROJ" and VEL4 == "ROJ" and VEL5 == "VER") or (VEL3 == "ROJ" and VEL4 == "VER" and VEL5 == "ROJ") or (VEL3 == "VER" and VEL4 == "ROJ" and VEL5 == "ROJ")) then TR3 = "M VERDE"
+end
+if (TR1 == "M VERDE" and TR2 == "ROJO" and TR3 == "M VERDE" and VEL1 == "ROJ") then ENTCNF = "VERDE"
+end 
+
+-- if de ENTRADA por COMPRA
+if (ENTCNF == "VERDE") then
+    plot_shape(1,
+            'Compra',
+            shape_style.triangleup,
+            shape_size.normal,
+            call_color,
+            shape_location.belowbar,
+            0,
+            "ENT.CONFIR",
+            "#fcfc03")
+        end
+        
+--if de entrada por VENTA
+if (ENTCNF == "ROJO") then
+    plot_shape(1,
+            'Venta',
+            shape_style.triangledown,
+            shape_size.normal,
+            put_color,
+            shape_location.abovebar,
+            0,
+            "ENT.CONFIR",
+            "#fcfc03")
+end                       
+
+-- LOGS para Debbug.
+-- print (TR1, TR2, TR3, VEL1, ENTCNF)
+
